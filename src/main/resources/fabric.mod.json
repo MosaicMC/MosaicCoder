@@ -3,20 +3,20 @@
   "id": "${mod_id}",
   "version": "${version}",
 
-  "name": "Example",
-  "description": "Example mod",
+  "name": "MosaicCoder",
+  "description": "Codec & config library",
   "authors": [
     "JustFoxx"
   ],
   "contact": {
-    "homepage": "https://github.com/MosaicMC/kotlin-mod-template",
-    "sources": "https://github.com/MosaicMC/kotlin-mod-template"
+    "homepage": "https://github.com/MosaicMC/MosaicCoder",
+    "sources": "https://github.com/MosaicMC/MosaicCoder"
   },
 
   "license": "LGPL-3.0",
   "environment": "*",
   "entrypoints": {
-    "main": [
+    "plugin": [
       {
         "adapter": "kotlin",
         "value": "io.github.mosaicmc.${mod_id}.internal.MainKt::init"
@@ -30,6 +30,7 @@
     "fabricloader": ">=0.14.19",
     "minecraft": "*",
     "java": ">=17",
-    "fabric-language-kotlin": "*"
+    "fabric-language-kotlin": "*",
+    "mosaiccore": ">=${mosaiccore_version}"
   }
 }
