@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+
+  "name": "Example",
+  "description": "Example mod",
+  "authors": [
+    "JustFoxx"
+  ],
+  "contact": {
+    "homepage": "https://github.com/MosaicMC/kotlin-mod-template",
+    "sources": "https://github.com/MosaicMC/kotlin-mod-template"
+  },
+
+  "license": "LGPL-3.0",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      {
+        "adapter": "kotlin",
+        "value": "io.github.mosaicmc.${mod_id}.internal.MainKt::init"
+      }
+    ]
+  },
+  "mixins": [
+    "${mod_id}.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.19",
+    "minecraft": "*",
+    "java": ">=17",
+    "fabric-language-kotlin": "*"
+  }
+}
