@@ -23,3 +23,6 @@ import io.github.mosaicmc.mosaiccore.api.plugin.logger
 fun init(plugin: PluginContainer) {
     plugin.logger.info("test")
 }
+
+
+
