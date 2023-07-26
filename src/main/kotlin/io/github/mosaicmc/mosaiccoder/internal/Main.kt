@@ -16,13 +16,50 @@
 
 package io.github.mosaicmc.mosaiccoder.internal
 
+import com.mojang.serialization.Codec
+import com.mojang.serialization.codecs.RecordCodecBuilder
+import io.github.mosaicmc.mosaiccoder.api.convertToJsonObject
+import io.github.mosaicmc.mosaiccoder.api.createConfig
+import io.github.mosaicmc.mosaiccoder.api.createOrReadConfig
+import io.github.mosaicmc.mosaiccoder.api.readConfig
 import io.github.mosaicmc.mosaiccore.api.plugin.PluginContainer
 import io.github.mosaicmc.mosaiccore.api.plugin.logger
 
+const val TEST = false
+
 @Suppress("UNUSED")
 fun init(plugin: PluginContainer) {
-    plugin.logger.info("test")
+    if (TEST) test(plugin)
 }
 
-
-
+fun test(plugin: PluginContainer) {
+    data class TestJson(val a: Int, val b: String)
+    val codec: Codec<TestJson> =
+        RecordCodecBuilder.create { instance ->
+            instance
+                .group(
+                    Codec.INT.optionalFieldOf("a", 0).forGetter { it.a },
+                    Codec.STRING.optionalFieldOf("b", "").forGetter { it.b }
+                )
+                .apply(instance, ::TestJson)
+        }
+    val converted = TestJson(1, "a").convertToJsonObject()
+    val createConfig = plugin.createConfig("common.json", codec, converted)
+    if (createConfig.error().isPresent) {
+        plugin.logger.error(createConfig.error().get().message())
+    } else {
+        plugin.logger.info("Successfully created common.json")
+    }
+    val readConfig = plugin.readConfig("common.json", codec)
+    if (readConfig.error().isPresent) {
+        plugin.logger.error(readConfig.error().get().message())
+    } else {
+        plugin.logger.info("Successfully read common.json")
+    }
+    val createOrReadConfig = plugin.createOrReadConfig("common.json", codec, converted)
+    if (createOrReadConfig.error().isPresent) {
+        plugin.logger.error(createOrReadConfig.error().get().message())
+    } else {
+        plugin.logger.info("Successfully created or read common.json")
+    }
+}

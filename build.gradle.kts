@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     id("fabric-loom") version "1.3.8"
     id("maven-publish")
@@ -19,21 +21,28 @@ group = project.properties["maven_group"].toString()
 repositories {
     maven { url = uri("https://jitpack.io") }
     maven { url = uri("https://api.modrinth.com/maven") }
+    maven { url = uri("https://maven.parchmentmc.org") }
 }
 
 dependencies {
     minecraft("com.mojang:minecraft:${project.properties["minecraft_version"]}")
-    mappings("net.fabricmc:yarn:${project.properties["minecraft_version"]}+build.${project.properties["yarn_mappings"]}:v2")
+
+
+    @Suppress("UnstableApiUsage")
+    mappings(loom.layered {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${project.properties["minecraft_version"]}:${project.properties["parchment_mappings"]}@zip")
+    })
+//    mappings("net.fabricmc:yarn:${project.properties["minecraft_version"]}+build.${project.properties["yarn_mappings"]}:v2")
     modImplementation("net.fabricmc:fabric-loader:${project.properties["loader_version"]}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${project.properties["fabric_kotlin_version"]}+kotlin.${project.properties["kotlin_version"]}")
-    modImplementation("maven.modrinth:mosaiccore:${project.properties["mosaiccore_version"]}")
+    implementation("maven.modrinth:mosaiccore:${project.properties["mosaiccore_version"]}")
     testImplementation("net.fabricmc:fabric-loader-junit:${project.properties["loader_version"]}")
 
     val mixinExtras = "com.github.LlamaLad7:MixinExtras:${project.properties["mixin_extras"]}"
 
     implementation(mixinExtras)
     annotationProcessor(mixinExtras)
-    include(mixinExtras)
 }
 
 tasks {
@@ -54,6 +63,13 @@ tasks {
 
     withType<JavaCompile>().configureEach {
         options.release = 17
+    }
+
+    withType<KotlinCompile>().configureEach {
+        kotlinOptions.jvmTarget = "17"
+        kotlinOptions.freeCompilerArgs = listOf(
+            "-Xlambdas=indy"
+        )
     }
 }
 
