@@ -25,14 +25,14 @@ import io.github.mosaicmc.mosaiccoder.api.readConfig
 import io.github.mosaicmc.mosaiccore.api.plugin.PluginContainer
 import io.github.mosaicmc.mosaiccore.api.plugin.logger
 
-const val TEST = false
+internal const val TEST = true
 
 @Suppress("UNUSED")
 fun init(plugin: PluginContainer) {
     if (TEST) test(plugin)
 }
 
-fun test(plugin: PluginContainer) {
+internal fun test(plugin: PluginContainer) {
     data class TestJson(val a: Int, val b: String)
     val codec: Codec<TestJson> =
         RecordCodecBuilder.create { instance ->
