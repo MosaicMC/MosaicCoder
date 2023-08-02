@@ -33,12 +33,19 @@ import java.io.FileWriter
 import java.io.IOException
 import net.fabricmc.loader.impl.FabricLoaderImpl
 
+/** Represents the directory where configuration files are stored. */
 val PluginContainer.configDir: File
     get() = FabricLoaderImpl.INSTANCE.configDir.resolve(name).toFile()
 
+/** Gson instance used for JSON serialization and deserialization. */
 val gson: Gson = GsonBuilder().setPrettyPrinting().create()
 
-fun <T : Any> T.convertToJsonObject(): JsonObject = gson.toJsonTree(this).asJsonObject
+/**
+ * Converts an object of type T to a JSON object using Gson serialization.
+ *
+ * @return The JSON representation of the object.
+ */
+fun <T : Any> T.convertTo(): JsonObject = gson.toJsonTree(this).asJsonObject
 
 /**
  * Reads and parses a configuration file with the specified [fileName] and [codec].
@@ -96,6 +103,42 @@ fun <T : Any> PluginContainer.createOrReadConfig(
         { file, either -> FileWriter(file).use { gson.toJson(either.left().get(), it) } },
         { JsonParser.parseReader(FileReader(it)).asJsonObject }
     )
+
+/**
+ * Writes configuration data to a specified file using the provided [fileWriter].
+ *
+ * @param fileName The name of the configuration file to be written.
+ * @param data The data to be written to the file.
+ * @return A [DataResult] representing the success or failure of the write operation.
+ */
+fun <T : Any> PluginContainer.writeConfig(fileName: String, data: T): DataResult<T> =
+    this.writeConfig(fileName, data) { file -> FileWriter(file).use { gson.toJson(data, it) } }
+
+/**
+ * Writes configuration data to a specified file using the provided [fileWriter].
+ *
+ * @param fileName The name of the configuration file to be written.
+ * @param dataToWrite The data to be written to the file.
+ * @param fileWriter A function that writes the configuration data to the file.
+ * @return A [DataResult] representing the success or failure of the write operation.
+ */
+fun <T : Any> PluginContainer.writeConfig(
+    fileName: String,
+    dataToWrite: T,
+    fileWriter: (File) -> Unit
+): DataResult<T> {
+    val file = configDir.resolve(fileName)
+    if (!file.exists()) {
+        return DataResult.error { "File not found" }
+    }
+
+    return try {
+        fileWriter(file)
+        DataResult.success(dataToWrite)
+    } catch (e: Exception) {
+        DataResult.error { "Failed to write file: ${e.message}" }
+    }
+}
 
 /**
  * Reads and parses a configuration file with the specified [fileName], [codec], and [ops].

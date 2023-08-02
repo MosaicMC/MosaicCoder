@@ -27,8 +27,6 @@ repositories {
     maven { url = uri("https://jitpack.io") }
     maven { url = uri("https://api.modrinth.com/maven") }
     maven { url = uri("https://maven.parchmentmc.org") }
-    maven { url = uri("https://maven.pkg.github.com/mosaicmc/mosaiccore") }
-
 }
 
 dependencies {
@@ -43,10 +41,6 @@ dependencies {
             )
         }
     )
-
-//    implementation("com.github.MosaicMC:MosaicCore:b0.1.5")
-
-//    implementation("io.github.mosaicmc.mosaiccore:mosaiccore:0.1.5-beta")
 
     modImplementation("net.fabricmc:fabric-loader:${project.properties["loader_version"]}")
     modImplementation(
