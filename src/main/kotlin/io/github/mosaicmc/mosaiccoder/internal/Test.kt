@@ -1,5 +1,6 @@
 package io.github.mosaicmc.mosaiccoder.internal
 
+import com.google.gson.JsonObject
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.codecs.RecordCodecBuilder
@@ -22,7 +23,7 @@ internal val testCoded: Codec<TestJson> =
             .apply(instance, ::TestJson)
     }
 
-internal fun Logger.printResult(result: DataResult<TestJson>, action: String) =
+internal fun Logger.printResult(result: DataResult<*>, action: String) =
     result
         .error()
         .ifPresentOrElse(
@@ -31,22 +32,23 @@ internal fun Logger.printResult(result: DataResult<TestJson>, action: String) =
         )
 
 internal fun PluginContainer.`create test config`(): DataResult<TestJson> =
-    this.createConfig("test.json", testCoded, convertedTest)
+    createConfig("test.json", testCoded, convertedTest)
 
 internal fun PluginContainer.`read test config`(): DataResult<TestJson> =
-    this.readConfig("test.json", testCoded)
+    readConfig("test.json", testCoded)
 
 internal fun PluginContainer.`create or read test config`(): DataResult<TestJson> =
-    this.createOrReadConfig("test.json", testCoded, convertedTest)
+    createOrReadConfig("test.json", testCoded, convertedTest)
 
-internal fun PluginContainer.`write test config`(): DataResult<TestJson> =
-    this.writeConfig("test.json", TestJson(2, "b"))
+internal fun PluginContainer.`write test config`(): DataResult<JsonObject> =
+    writeConfig("test.json", TestJson(2, "b").convertTo())
 
 internal fun PluginContainer.test() {
     val test1 = `read test config`()
     val test2 = `create or read test config`()
     val test3 = `create test config`()
     val test4 = `write test config`()
+
     logger.printResult(test1, "read test config")
     logger.printResult(test2, "create or read test config")
     logger.printResult(test3, "create test config")

@@ -105,13 +105,13 @@ fun <T : Any> PluginContainer.createOrReadConfig(
     )
 
 /**
- * Writes configuration data to a specified file using the provided [fileWriter].
+ * Writes configuration data to a specified file using a json file writer.
  *
  * @param fileName The name of the configuration file to be written.
  * @param data The data to be written to the file.
  * @return A [DataResult] representing the success or failure of the write operation.
  */
-fun <T : Any> PluginContainer.writeConfig(fileName: String, data: T): DataResult<T> =
+fun PluginContainer.writeConfig(fileName: String, data: JsonObject): DataResult<JsonObject> =
     this.writeConfig(fileName, data) { file -> FileWriter(file).use { gson.toJson(data, it) } }
 
 /**
@@ -122,11 +122,11 @@ fun <T : Any> PluginContainer.writeConfig(fileName: String, data: T): DataResult
  * @param fileWriter A function that writes the configuration data to the file.
  * @return A [DataResult] representing the success or failure of the write operation.
  */
-fun <T : Any> PluginContainer.writeConfig(
+fun PluginContainer.writeConfig(
     fileName: String,
-    dataToWrite: T,
+    dataToWrite: JsonObject,
     fileWriter: (File) -> Unit
-): DataResult<T> {
+): DataResult<JsonObject> {
     val file = configDir.resolve(fileName)
     if (!file.exists()) {
         return DataResult.error { "File not found" }
