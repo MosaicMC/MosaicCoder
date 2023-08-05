@@ -7,6 +7,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder
 import io.github.mosaicmc.mosaiccoder.api.*
 import io.github.mosaicmc.mosaiccore.api.plugin.PluginContainer
 import io.github.mosaicmc.mosaiccore.api.plugin.logger
+import kotlin.reflect.KFunction
 import org.slf4j.Logger
 
 internal data class TestJson(val a: Int, val b: String)
@@ -23,13 +24,16 @@ internal val testCoded: Codec<TestJson> =
             .apply(instance, ::TestJson)
     }
 
-internal fun Logger.printResult(result: DataResult<*>, action: String) =
+internal fun Logger.printResult(result: KFunction<DataResult<*>>) {
+    val name = result.name
     result
+        .call()
         .error()
         .ifPresentOrElse(
-            { error("Failed to $action: ${it.message()}") },
-            { info("Successfully $action") }
+            { error("Failed to test `$name`: ${it.message()}") },
+            { info("Successfully test `$name`") }
         )
+}
 
 internal fun PluginContainer.`create test config`(): DataResult<TestJson> =
     createConfig("test.json", testCoded, convertedTest)
@@ -41,16 +45,11 @@ internal fun PluginContainer.`create or read test config`(): DataResult<TestJson
     createOrReadConfig("test.json", testCoded, convertedTest)
 
 internal fun PluginContainer.`write test config`(): DataResult<JsonObject> =
-    writeConfig("test.json", TestJson(2, "b").convertTo())
+    writeConfig("test.json", convertedTest)
 
 internal fun PluginContainer.test() {
-    val test1 = `read test config`()
-    val test2 = `create or read test config`()
-    val test3 = `create test config`()
-    val test4 = `write test config`()
-
-    logger.printResult(test1, "read test config")
-    logger.printResult(test2, "create or read test config")
-    logger.printResult(test3, "create test config")
-    logger.printResult(test4, "write test config")
+    logger.printResult(::`read test config`)
+    logger.printResult(::`create or read test config`)
+    logger.printResult(::`create test config`)
+    logger.printResult(::`write test config`)
 }
