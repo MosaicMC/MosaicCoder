@@ -1,3 +1,4 @@
+@file:JvmName("Test")
 package io.github.mosaicmc.mosaiccoder.internal
 
 import com.google.gson.JsonObject
@@ -13,7 +14,7 @@ import org.slf4j.Logger
 internal data class TestJson(val a: Int, val b: String)
 
 internal val testJson = TestJson(1, "a")
-internal val convertedTest = testJson.convertTo()
+internal val convertedTest = testJson.asJsonObject
 internal val testCoded: Codec<TestJson> =
     RecordCodecBuilder.create { instance ->
         instance
@@ -26,8 +27,7 @@ internal val testCoded: Codec<TestJson> =
 
 internal fun Logger.printResult(result: KFunction<DataResult<*>>) {
     val name = result.name
-    result
-        .call()
+    result.call()
         .error()
         .ifPresentOrElse(
             { error("Failed to test `$name`: ${it.message()}") },
