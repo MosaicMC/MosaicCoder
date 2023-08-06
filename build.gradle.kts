@@ -86,7 +86,12 @@ tasks {
 
     withType<KotlinCompile>().configureEach {
         kotlinOptions.jvmTarget = "17"
-        kotlinOptions.freeCompilerArgs += "-Xlambdas=indy"
+        kotlinOptions.freeCompilerArgs += listOf(
+            "-Xlambdas=indy",
+            "-Xno-param-assertions",
+            "-Xno-call-assertions",
+            "-Xno-receiver-assertions",
+        )
     }
 
     register<Jar>("dokkaHtmlJar") {
