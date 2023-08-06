@@ -14,6 +14,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 @file:JvmName("Main")
+
 package io.github.mosaicmc.mosaiccoder.internal
 
 import io.github.mosaicmc.mosaiccore.api.plugin.PluginContainer

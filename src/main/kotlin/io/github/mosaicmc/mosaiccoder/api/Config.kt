@@ -15,6 +15,7 @@
  */
 @file:JvmName("Config")
 @file:Suppress("unused")
+
 package io.github.mosaicmc.mosaiccoder.api
 
 import com.google.gson.Gson
