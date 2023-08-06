@@ -13,15 +13,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:JvmName("Main")
+@file:JvmName("Utils")
 
 package io.github.mosaicmc.mosaiccoder.internal
 
-import io.github.mosaicmc.mosaiccore.api.plugin.PluginContainer
+import com.mojang.serialization.DataResult
 
-internal const val TEST = true
-
-@Suppress("UNUSED")
-fun init(plugin: PluginContainer) {
-    if (TEST) plugin.test()
-}
+internal fun <T : Any> wrapResult(wrapped: () -> DataResult<T>): DataResult<T> =
+    try {
+        wrapped()
+    } catch (e: Exception) {
+        DataResult.error { e.message }
+    }

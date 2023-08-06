@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2023. JustFoxx
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+@file:JvmName("Test")
+
 package io.github.mosaicmc.mosaiccoder.internal
 
 import com.google.gson.JsonObject
@@ -7,12 +24,13 @@ import com.mojang.serialization.codecs.RecordCodecBuilder
 import io.github.mosaicmc.mosaiccoder.api.*
 import io.github.mosaicmc.mosaiccore.api.plugin.PluginContainer
 import io.github.mosaicmc.mosaiccore.api.plugin.logger
+import kotlin.reflect.KFunction
 import org.slf4j.Logger
 
 internal data class TestJson(val a: Int, val b: String)
 
 internal val testJson = TestJson(1, "a")
-internal val convertedTest = testJson.convertTo()
+internal val convertedTest = testJson.asJsonObject
 internal val testCoded: Codec<TestJson> =
     RecordCodecBuilder.create { instance ->
         instance
@@ -23,13 +41,16 @@ internal val testCoded: Codec<TestJson> =
             .apply(instance, ::TestJson)
     }
 
-internal fun Logger.printResult(result: DataResult<*>, action: String) =
+internal fun Logger.printResult(result: KFunction<DataResult<*>>) {
+    val name = result.name
     result
+        .call()
         .error()
         .ifPresentOrElse(
-            { error("Failed to $action: ${it.message()}") },
-            { info("Successfully $action") }
+            { error("Failed to test `$name`: ${it.message()}") },
+            { info("Successfully test `$name`") }
         )
+}
 
 internal fun PluginContainer.`create test config`(): DataResult<TestJson> =
     createConfig("test.json", testCoded, convertedTest)
@@ -41,16 +62,11 @@ internal fun PluginContainer.`create or read test config`(): DataResult<TestJson
     createOrReadConfig("test.json", testCoded, convertedTest)
 
 internal fun PluginContainer.`write test config`(): DataResult<JsonObject> =
-    writeConfig("test.json", TestJson(2, "b").convertTo())
+    writeConfig("test.json", convertedTest)
 
 internal fun PluginContainer.test() {
-    val test1 = `read test config`()
-    val test2 = `create or read test config`()
-    val test3 = `create test config`()
-    val test4 = `write test config`()
-
-    logger.printResult(test1, "read test config")
-    logger.printResult(test2, "create or read test config")
-    logger.printResult(test3, "create test config")
-    logger.printResult(test4, "write test config")
+    logger.printResult(::`read test config`)
+    logger.printResult(::`create or read test config`)
+    logger.printResult(::`create test config`)
+    logger.printResult(::`write test config`)
 }
