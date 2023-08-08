@@ -25,6 +25,8 @@ import com.google.gson.JsonParser
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.JsonOps
+import io.github.mosaicmc.mosaiccoder.internal.asJsonObject
+import io.github.mosaicmc.mosaiccoder.internal.gson
 import io.github.mosaicmc.mosaiccoder.internal.wrapResult
 import io.github.mosaicmc.mosaiccore.api.plugin.PluginContainer
 import io.github.mosaicmc.mosaiccore.api.plugin.name
@@ -37,10 +39,6 @@ import net.fabricmc.loader.impl.FabricLoaderImpl
 val PluginContainer.configDir: File
     get() = FabricLoaderImpl.INSTANCE.configDir.resolve(name).toFile()
 
-val gson: Gson = GsonBuilder().setPrettyPrinting().create()
-
-val <T : Any> T.asJsonObject: JsonObject
-    get() = gson.toJsonTree(this).asJsonObject
 
 @Deprecated("Use PluginConfig instead.", ReplaceWith("PluginConfig"))
 fun PluginContainer.writeConfig(

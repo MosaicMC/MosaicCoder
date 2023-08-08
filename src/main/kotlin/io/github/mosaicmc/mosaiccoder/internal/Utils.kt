@@ -17,6 +17,9 @@
 
 package io.github.mosaicmc.mosaiccoder.internal
 
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonObject
 import com.mojang.serialization.DataResult
 
 internal fun <T : Any> wrapResult(wrapped: () -> DataResult<T>): DataResult<T> =
@@ -25,3 +28,8 @@ internal fun <T : Any> wrapResult(wrapped: () -> DataResult<T>): DataResult<T> =
     } catch (e: Exception) {
         DataResult.error { e.message }
     }
+
+val gson: Gson = GsonBuilder().setPrettyPrinting().create()
+
+val <T : Any> T.asJsonObject: JsonObject
+    get() = gson.toJsonTree(this).asJsonObject
