@@ -18,8 +18,6 @@
 
 package io.github.mosaicmc.mosaiccoder.api
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.mojang.serialization.Codec
@@ -38,7 +36,6 @@ import net.fabricmc.loader.impl.FabricLoaderImpl
 /** Represents the directory where configuration files are stored. */
 val PluginContainer.configDir: File
     get() = FabricLoaderImpl.INSTANCE.configDir.resolve(name).toFile()
-
 
 @Deprecated("Use PluginConfig instead.", ReplaceWith("PluginConfig"))
 fun PluginContainer.writeConfig(
