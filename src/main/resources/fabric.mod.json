@@ -19,7 +19,7 @@
     "plugin": [
       {
         "adapter": "kotlin",
-        "value": "io.github.mosaicmc.${mod_id}.internal.MainKt::init"
+        "value": "io.github.mosaicmc.${mod_id}.internal.Main::init"
       }
     ]
   },

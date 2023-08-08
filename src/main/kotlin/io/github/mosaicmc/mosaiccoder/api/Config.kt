@@ -37,12 +37,12 @@ import net.fabricmc.loader.impl.FabricLoaderImpl
 val PluginContainer.configDir: File
     get() = FabricLoaderImpl.INSTANCE.configDir.resolve(name).toFile()
 
-/** Gson instance used for JSON serialization and deserialization. */
 val gson: Gson = GsonBuilder().setPrettyPrinting().create()
 
 val <T : Any> T.asJsonObject: JsonObject
     get() = gson.toJsonTree(this).asJsonObject
 
+@Deprecated("Use PluginConfig instead.", ReplaceWith("PluginConfig"))
 fun PluginContainer.writeConfig(
     fileName: String,
     dataToWrite: JsonObject,
@@ -55,6 +55,7 @@ fun PluginContainer.writeConfig(
     return@wrapResult DataResult.success(dataToWrite)
 }
 
+@Deprecated("Use PluginConfig instead.", ReplaceWith("PluginConfig"))
 fun <T : Any> PluginContainer.writeConfig(
     fileName: String,
     dataToWrite: T,
@@ -70,6 +71,7 @@ fun <T : Any> PluginContainer.writeConfig(
     return@wrapResult parsed
 }
 
+@Deprecated("Use PluginConfig instead.", ReplaceWith("PluginConfig"))
 fun <T : Any> PluginContainer.readConfig(
     fileName: String = "common.json",
     codec: Codec<T>
@@ -83,6 +85,7 @@ fun <T : Any> PluginContainer.readConfig(
     return@wrapResult codec.parse(JsonOps.INSTANCE, readFile)
 }
 
+@Deprecated("Use PluginConfig instead.", ReplaceWith("PluginConfig"))
 fun <T : Any> PluginContainer.createConfig(
     fileName: String = "common.json",
     codec: Codec<T>,
@@ -101,6 +104,7 @@ fun <T : Any> PluginContainer.createConfig(
     return@wrapResult parsed
 }
 
+@Deprecated("Use PluginConfig instead.", ReplaceWith("PluginConfig"))
 fun <T : Any> PluginContainer.createOrReadConfig(
     fileName: String = "common.json",
     codec: Codec<T>,
@@ -109,6 +113,7 @@ fun <T : Any> PluginContainer.createOrReadConfig(
     if (configDir.resolve(fileName).exists()) readConfig(fileName, codec)
     else createConfig(fileName, codec, defaultObject)
 
+@Deprecated("Use PluginConfig instead.", ReplaceWith("PluginConfig"))
 fun <T : Any> PluginContainer.createOrReadConfig(
     fileName: String = "common.json",
     codec: Codec<T>,

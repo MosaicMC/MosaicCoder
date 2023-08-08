@@ -19,7 +19,7 @@ package io.github.mosaicmc.mosaiccoder.internal
 
 import io.github.mosaicmc.mosaiccore.api.plugin.PluginContainer
 
-internal const val TEST = false
+internal val TEST = System.getProperty("test", "false") == "true"
 
 @Suppress("UNUSED")
 fun init(plugin: PluginContainer) {
