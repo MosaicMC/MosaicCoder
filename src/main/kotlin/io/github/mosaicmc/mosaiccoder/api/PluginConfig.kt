@@ -4,6 +4,8 @@ import com.google.gson.JsonParser
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.JsonOps
+import io.github.mosaicmc.mosaiccoder.internal.asJsonObject
+import io.github.mosaicmc.mosaiccoder.internal.gson
 import io.github.mosaicmc.mosaiccoder.internal.wrapResult
 import io.github.mosaicmc.mosaiccore.api.plugin.PluginContainer
 import java.io.File
