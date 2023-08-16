@@ -1,16 +1,18 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package io.github.mosaicmc.mosaiccoder.api
 
 import com.google.gson.JsonParser
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.JsonOps
-import io.github.mosaicmc.mosaiccoder.internal.asJsonObject
-import io.github.mosaicmc.mosaiccoder.internal.gson
+import io.github.mosaicmc.mosaiccoder.internal.*
 import io.github.mosaicmc.mosaiccoder.internal.wrapResult
 import io.github.mosaicmc.mosaiccore.api.plugin.PluginContainer
 import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
+import java.util.WeakHashMap
 
 /**
  * A utility class for managing and interacting with plugin configuration files.
@@ -30,7 +32,7 @@ private constructor(private val file: File, private val codec: Codec<T>, private
      *
      * @return A [DataResult] containing the reloaded configuration data or an error.
      */
-    fun reload(): DataResult<T> = wrapResult { forceRead() }
+    fun reloadData(): DataResult<T> = wrapResult { forceReadData() }
 
     /**
      * Writes new configuration data to the file.
@@ -38,9 +40,9 @@ private constructor(private val file: File, private val codec: Codec<T>, private
      * @param newData The new configuration data to be written.
      * @return A [DataResult] indicating success or an error during the write operation.
      */
-    fun write(newData: T): DataResult<T> = wrapResult {
+    fun writeData(newData: T): DataResult<T> = wrapResult {
         if (!file.exists()) {
-            val createdData = create()
+            val createdData = createFile()
             if (createdData.error().isPresent) return@wrapResult createdData
         }
 
@@ -60,15 +62,15 @@ private constructor(private val file: File, private val codec: Codec<T>, private
      */
     fun getData(): DataResult<T> = wrapResult {
         if (data == null) {
-            val forceReadData = forceRead()
+            val forceReadData = forceReadData()
             if (forceReadData.error().isPresent) return@wrapResult forceReadData
-            data = forceRead().result().get()
+            data = forceReadData().result().get()
         }
         DataResult.success(data!!)
     }
 
-    private fun forceRead(): DataResult<T> = wrapResult {
-        if (!file.exists()) onFileNotExists()
+    inline private fun forceReadData(): DataResult<T> = wrapResult {
+        if (!file.exists()) createData()
 
         val readFile = JsonParser.parseReader(FileReader(file)).asJsonObject
         val parsedData = codec.parse(JsonOps.INSTANCE, readFile)
@@ -79,7 +81,7 @@ private constructor(private val file: File, private val codec: Codec<T>, private
         parsedData
     }
 
-    private fun create(): DataResult<T> = wrapResult {
+    inline private fun createFile(): DataResult<T> = wrapResult {
         file.parentFile.mkdirs()
         file.createNewFile()
 
@@ -87,20 +89,21 @@ private constructor(private val file: File, private val codec: Codec<T>, private
 
         if (parsed.error().isPresent) return@wrapResult parsed
 
-        FileWriter(file).use { gson.toJson(parsed.result().get(), it) }
+        val fileWriter = FileWriter(file)
+        gson.toJson(parsed.result().get(), fileWriter)
+
         parsed
     }
 
-    private fun onFileNotExists(): DataResult<T> = wrapResult {
-        val createdData = create()
+    inline private fun createData(): DataResult<T> = wrapResult {
+        val createdData = createFile()
         if (createdData.error().isPresent) return@wrapResult createdData
         data = createdData.result().get()
         createdData
     }
 
     companion object {
-        private val configs = mutableMapOf<File, PluginConfig<*>>()
-
+        @JvmStatic private val configs = WeakHashMap<File, PluginConfig<*>>()
         /**
          * Retrieves or creates a configuration instance for a plugin.
          *
@@ -109,14 +112,26 @@ private constructor(private val file: File, private val codec: Codec<T>, private
          * @param default The default configuration data.
          * @return A [PluginConfig] instance for the specified plugin and configuration file.
          */
+        @JvmStatic
         fun <T : Any> PluginContainer.getConfig(
             fileName: String,
             codec: Codec<T>,
             default: T
         ): PluginConfig<T> {
             val file = configDir.resolve(fileName)
-
-            return configs.getOrDefault(file, PluginConfig(file, codec, default)) as PluginConfig<T>
+            val pluginConfig = PluginConfig(file, codec, default)
+            return configs.getOrDefaultExt(file, pluginConfig)
         }
+
+        /**
+         * Retrieves a configuration instance for a plugin if exists.
+         *
+         * @param fileName The name of the configuration file.
+         * @return A [PluginConfig] instance for the specified plugin and configuration file.
+         */
+        @JvmStatic
+        fun <T : Any> PluginContainer.getConfig(
+            fileName: String,
+        ): PluginConfig<T>? = configs.getExt(configDir.resolve(fileName))
     }
 }

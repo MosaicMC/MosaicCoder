@@ -54,10 +54,10 @@ internal fun PluginContainer.`get test config`(): DataResult<TestJson> =
     getConfig("test.json", testCoded, testJson).getData()
 
 internal fun PluginContainer.`reload test config`(): DataResult<TestJson> =
-    getConfig("test.json", testCoded, testJson).reload()
+    getConfig("test.json", testCoded, testJson).reloadData()
 
 internal fun PluginContainer.`write test config`(): DataResult<TestJson> =
-    getConfig("test.json", testCoded, testJson).write(TestJson(2, "z"))
+    getConfig("test.json", testCoded, testJson).writeData(TestJson(2, "z"))
 
 internal fun PluginContainer.test() {
     logger.printResult(::`get test config`)
